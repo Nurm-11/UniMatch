@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>University Finder</title>
+
+  <!-- MAIN CSS -->
+  <link rel="stylesheet" href="css/universities.css">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="header">
+  <nav class="nav">
+    <div class="logo">Uni Match</div>
+    <a class="home-btn" href="index.html">Home</a>
+  </nav>
+</header>
+
+<!-- ================= LAYOUT ================= -->
+<div class="finder-layout">
+
+  <!-- ===== SIDEBAR / FILTERS ===== -->
+  <aside class="finder-sidebar">
+    <h3>Filters</h3>
+
+    <input id="search" placeholder="University name">
+
+    <select id="country">
+      <option value="">Country</option>
+    </select>
+
+    <select id="major">
+      <option value="">Major</option>
+    </select>
+
+    <select id="tier">
+      <option value="">Tier</option>
+      <option value="1">Top 1–100</option>
+      <option value="2">100–500</option>
+      <option value="3">500–1000</option>
+      <option value="4">1000+</option>
+    </select>
+
+    <select id="fullRide">
+      <option value="">Full Ride possible</option>
+      <option value="yes">YES</option>
+      <option value="no">NO</option>
+    </select>
+
+    <select id="sort">
+      <option value="">Sort by ranking</option>
+      <option value="asc">Low → High</option>
+      <option value="desc">High → Low</option>
+    </select>
+  </aside>
+
+  <!-- ===== RESULTS ===== -->
+  <main id="list" class="finder-results"></main>
+
+</div>
+
+<!-- ================= EMPTY STATE ================= -->
+<div id="empty" class="finder-empty">
+  Use filters to find universities
+</div>
+
+<!-- ================= CARD TEMPLATE ================= -->
+<template id="card">
+  <div class="university-card">
+    <h3 class="name"></h3>
+    <a class="site" target="_blank">Official website</a>
+
+    <p><b>Country:</b> <span class="country"></span></p>
+    <p><b>Rank:</b> #<span class="ranking"></span></p>
+
+    <p><b>Tier:</b> <span class="tier badge"></span></p>
+    <p><b>Full Ride:</b> <span class="fullride badge"></span></p>
+    <p><b>Scholarships:</b> <span class="scholar badge"></span></p>
+
+    <div class="majors">
+      <h4>Majors</h4>
+      <ul class="majors-list"></ul>
+    </div>
+  </div>
+</template>
+
+<!-- ================= DATA ================= -->
+<script src="js/universities.js"></script>
+
+<script>
+/* ================= HELPERS ================= */
+function getTier(rank) {
+  if (!rank || isNaN(rank)) return null;
+  if (rank <= 100) return 1;
+  if (rank <= 500) return 2;
+  if (rank <= 1000) return 3;
+  return 4;
+}
+
+/* ================= DOM ================= */
+const list     = document.getElementById("list");
+const empty    = document.getElementById("empty");
+const template = document.getElementById("card");
+
+const filters = {
+  search:   document.getElementById("search"),
+  country:  document.getElementById("country"),
+  major:    document.getElementById("major"),
+  tier:     document.getElementById("tier"),
+  fullRide: document.getElementById("fullRide"),
+  sort:     document.getElementById("sort")
+};
+
+/* ================= FILL FILTERS ================= */
+const unique = arr => [...new Set(arr)].sort();
+
+unique(universities.map(u => u.country))
+  .forEach(c => filters.country.add(new Option(c, c)));
+
+unique(universities.flatMap(u => u.majors))
+  .forEach(m => filters.major.add(new Option(m, m)));
+
+/* ================= RENDER ================= */
+function render(data) {
+  list.innerHTML = "";
+
+  if (!data.length) {
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  data.forEach(u => {
+    const card = template.content.cloneNode(true);
+
+    card.querySelector(".name").textContent = u.name;
+    card.querySelector(".site").href = u.website;
+    card.querySelector(".country").textContent = u.country;
+    card.querySelector(".ranking").textContent = u.qsRankApprox ?? "N/A";
+
+    const tierValue = getTier(u.qsRankApprox);
+    card.querySelector(".tier").textContent =
+      tierValue === 1 ? "Top 1–100" :
+      tierValue === 2 ? "100–500" :
+      tierValue === 3 ? "500–1000" :
+      tierValue === 4 ? "1000+" : "N/A";
+
+    const fr = card.querySelector(".fullride");
+    fr.textContent = u.scholarships.fullRidePossible ? "YES" : "NO";
+    fr.className = `fullride badge ${u.scholarships.fullRidePossible ? "yes" : "no"}`;
+
+    const sch = card.querySelector(".scholar");
+    sch.textContent = u.scholarships.type;
+    sch.className = `scholar badge ${
+      u.scholarships.type.toLowerCase().includes("need") ? "need" : "merit"
+    }`;
+
+    const majors = card.querySelector(".majors-list");
+    u.majors.forEach(m => {
+      const li = document.createElement("li");
+      li.textContent = m;
+      majors.appendChild(li);
+    });
+
+    list.appendChild(card);
+  });
+}
+
+/* ================= FILTER PIPELINE ================= */
+function applyFilters() {
+  const { search, country, major, tier, fullRide, sort } = filters;
+
+  let result = universities
+    .filter(u =>
+      !search.value ||
+      u.name.toLowerCase().includes(search.value.toLowerCase())
+    )
+    .filter(u =>
+      !country.value || u.country === country.value
+    )
+    .filter(u =>
+      !major.value || u.majors.includes(major.value)
+    )
+    .filter(u =>
+      !tier.value ||
+      (u.qsRankApprox && getTier(u.qsRankApprox) === Number(tier.value))
+    )
+    .filter(u =>
+      !fullRide.value ||
+      u.scholarships.fullRidePossible === (fullRide.value === "yes")
+    );
+
+  if (sort.value === "asc") {
+    result.sort((a, b) =>
+      (a.qsRankApprox ?? Infinity) - (b.qsRankApprox ?? Infinity)
+    );
+  }
+
+  if (sort.value === "desc") {
+    result.sort((a, b) =>
+      (b.qsRankApprox ?? -Infinity) - (a.qsRankApprox ?? -Infinity)
+    );
+  }
+
+  render(result);
+}
+
+/* ================= EVENTS ================= */
+Object.values(filters).forEach(el => {
+  el.addEventListener(
+    el.tagName === "INPUT" ? "input" : "change",
+    applyFilters
+  );
+});
+
+/* ================= INIT ================= */
+render(universities);
+</script>
+
+</body>
+</html>
