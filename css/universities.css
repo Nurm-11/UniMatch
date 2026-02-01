@@ -1,0 +1,237 @@
+/* =========================
+   Reset & Base
+   ========================= */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding-top: 80px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #1f2937;
+    background-color: #f8fafc;
+    line-height: 1.6;
+}
+
+/* =========================
+   Header
+   ========================= */
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    z-index: 1000;
+}
+
+.nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.home-btn {
+    background: linear-gradient(135deg, #0048ff, #000dff);
+    color: #fff;
+    padding: 0.6rem 1.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* =========================
+   Layout (DESKTOP)
+   ========================= */
+.finder-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    display: grid;
+    grid-template-columns: minmax(240px, 280px) 1fr;
+    grid-template-areas: "sidebar results";
+    gap: 2rem;
+    align-items: start;
+}
+
+/* =========================
+   Sidebar
+   ========================= */
+.finder-sidebar {
+    grid-area: sidebar;
+    background-color: #fff;
+    padding: 1.6rem;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 100px;
+}
+
+.finder-sidebar h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.2rem;
+    color: #2563eb;
+}
+
+.finder-sidebar input,
+.finder-sidebar select {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    margin-bottom: 0.9rem;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    font-size: 0.9rem;
+}
+
+.finder-sidebar input:focus,
+.finder-sidebar select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* =========================
+   Results
+   ========================= */
+.finder-results {
+    grid-area: results;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.6rem;
+}
+
+/* =========================
+   University Card
+   ========================= */
+.university-card {
+    background-color: #fff;
+    padding: 1.4rem;
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.07);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.university-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.12);
+}
+
+.university-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+}
+
+.site {
+    display: inline-block;
+    margin-bottom: 0.6rem;
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.site:hover {
+    text-decoration: underline;
+}
+
+.university-card p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+/* =========================
+   Majors
+   ========================= */
+.majors {
+    margin-top: 0.9rem;
+}
+
+.majors h4 {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    color: #2563eb;
+}
+
+.majors-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0;
+    margin: 0;
+}
+
+.majors-list li {
+    list-style: none;
+    background: #eef2ff;
+    padding: 0.25rem 0.55rem;
+    border-radius: 8px;
+    font-size: 0.72rem;
+}
+
+/* =========================
+   Empty State
+   ========================= */
+.finder-empty {
+    max-width: 1200px;
+    margin: 2rem auto;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #6b7280;
+}
+
+/* =========================
+   MOBILE (FILTER ON TOP)
+   ========================= */
+@media (max-width: 768px) {
+    body {
+        padding-top: 70px;
+    }
+
+    .header {
+        height: 70px;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+    }
+
+    .finder-layout {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "sidebar"
+            "results";
+        padding: 2rem 1rem;
+    }
+
+    .finder-sidebar {
+        position: static;
+        margin-bottom: 1.4rem;
+    }
+}
+
+/* =========================
+   LARGE SCREENS
+   ========================= */
+@media (min-width: 1400px) {
+    .finder-layout {
+        max-width: 1350px;
+    }
+}
